@@ -1,0 +1,82 @@
+CREATE TABLE IF NOT EXISTS app_users (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ name VARCHAR(120) NOT NULL,
+ email VARCHAR(160) NOT NULL UNIQUE,
+ password_hash VARCHAR(255) NOT NULL,
+ role VARCHAR(20) NOT NULL,
+ roll_no VARCHAR(40),
+ department VARCHAR(80),
+ semester INT DEFAULT 1,
+ active BOOLEAN DEFAULT TRUE,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS attendance (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ student_id BIGINT NOT NULL,
+ subject VARCHAR(100) NOT NULL,
+ class_date DATE NOT NULL,
+ status VARCHAR(15) NOT NULL,
+ marked_by BIGINT,
+ CONSTRAINT fk_att_student FOREIGN KEY (student_id) REFERENCES app_users(id)
+);
+CREATE TABLE IF NOT EXISTS marks (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ student_id BIGINT NOT NULL,
+ subject VARCHAR(100) NOT NULL,
+ exam_type VARCHAR(20) NOT NULL,
+ obtained DECIMAL(6,2) NOT NULL,
+ max_marks DECIMAL(6,2) NOT NULL,
+ semester INT NOT NULL,
+ published BOOLEAN DEFAULT FALSE,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ CONSTRAINT fk_marks_student FOREIGN KEY (student_id) REFERENCES app_users(id)
+);
+CREATE TABLE IF NOT EXISTS notices (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ title VARCHAR(180) NOT NULL,
+ body TEXT NOT NULL,
+ category VARCHAR(50) DEFAULT 'General',
+ created_by BIGINT,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS complaints (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ student_id BIGINT NOT NULL,
+ subject VARCHAR(180) NOT NULL,
+ description TEXT NOT NULL,
+ category VARCHAR(60) DEFAULT 'General',
+ status VARCHAR(30) DEFAULT 'Submitted',
+ admin_reply TEXT,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT fk_complaint_student FOREIGN KEY (student_id) REFERENCES app_users(id)
+);
+CREATE TABLE IF NOT EXISTS lost_found (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ user_id BIGINT NOT NULL,
+ item_name VARCHAR(120) NOT NULL,
+ description TEXT,
+ item_type VARCHAR(20) NOT NULL,
+ location VARCHAR(120),
+ status VARCHAR(25) DEFAULT 'Open',
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT fk_lost_user FOREIGN KEY (user_id) REFERENCES app_users(id)
+);
+CREATE TABLE IF NOT EXISTS queue_tokens (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ student_id BIGINT NOT NULL,
+ department VARCHAR(80) NOT NULL,
+ token_no INT NOT NULL,
+ status VARCHAR(25) DEFAULT 'Waiting',
+ visit_date DATE NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT fk_queue_student FOREIGN KEY (student_id) REFERENCES app_users(id)
+);
+CREATE TABLE IF NOT EXISTS opportunities (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ title VARCHAR(180) NOT NULL,
+ organization VARCHAR(120),
+ description TEXT,
+ opportunity_type VARCHAR(50),
+ deadline DATE,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
